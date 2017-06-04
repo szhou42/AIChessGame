@@ -14,8 +14,8 @@ public class Minimax {
 		GameState game_state = new GameState(chessboard);
 		tmpState = null;
 		boolean maxPlayer = !chessboard.getTurn();
-		int ret = minimax(game_state, 3, maxPlayer, true);
-		System.out.println("best move will have ranking: " + Integer.toString(ret));
+		float ret = minimax(game_state, 5, maxPlayer, true,Integer.MIN_VALUE, Integer.MAX_VALUE);
+		System.out.println("best move will have ranking: " + Float.toString(ret));
 		return state2Movement(game_state, tmpState);
 	}
 	
@@ -46,35 +46,43 @@ public class Minimax {
 		return m;
 	}
 	
-	public int minimax(GameState game_state, int depth, boolean max_player, boolean firstRecur) {
-		int best_val;
+	public float minimax(GameState game_state, int depth, boolean max_player, boolean firstRecur, float alpha, float beta) {
+		float best_val;
 		//System.out.println(Boolean.toString(max_player) + " turn");
 		// Base Case
 		if(depth == 0 || game_state.is_terminal()) {
-			return game_state.heuristic();
+			return game_state.heuristic(1);
 		}
 		
 		// Recursive Case
 		if(max_player) {
-			best_val = Integer.MIN_VALUE;
+			best_val = Float.MIN_VALUE;
 			for(GameState child_state : game_state) {
-				int ret = minimax(child_state, depth - 1, false, false);
-				best_val = Math.max(best_val, ret);
-				if(firstRecur && best_val >= ret)
+				float ret = minimax(child_state, depth - 1, false, false, alpha, beta);
+				alpha = Math.max(best_val, ret);
+				if(firstRecur && alpha >= ret)
 					tmpState = child_state;
+				if(alpha >= beta)
+					break;
 			}
+			if(firstRecur) {
+				System.out.println(tmpState.getChessboard());
+			}
+			return alpha;
 		}
 		else {
-			best_val = Integer.MAX_VALUE;
+			best_val = Float.MAX_VALUE;
 			for(GameState child_state : game_state) {
-				int ret = minimax(child_state, depth - 1, true, false);
-				best_val = Math.min(best_val, ret);
+				float ret = minimax(child_state, depth - 1, true, false, alpha, beta);
+				beta = Math.min(best_val, ret);
+				if(alpha >= beta)
+					break;
 			}
+			if(firstRecur) {
+				System.out.println(tmpState.getChessboard());
+			}
+			return beta;
 		}
-		if(firstRecur) {
-			System.out.println(tmpState.getChessboard());
-		}
-		return best_val;
 	}
 	
 	public static void main(String[] args) {

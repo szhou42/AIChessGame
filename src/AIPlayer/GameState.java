@@ -1,13 +1,20 @@
 package AIPlayer;
-import java.util.Iterator;
-
 import ChessBoardPackage.ChessBoard;
+import ChessPiecePackage.ChessPiece;
 
+import java.util.*;
 public class GameState implements Iterable<GameState>{
 
 	ChessBoard chessboard;
+	HashMap<String, Integer> weights = new HashMap<String, Integer>();
 	public GameState(ChessBoard chessboard) {
 		this.chessboard = chessboard;
+		weights.put("King", 10);
+		weights.put("Queen", 9);
+		weights.put("Bishop", 4);
+		weights.put("Rook", 6);
+		weights.put("Knight", 5);
+		weights.put("Pawn", 1);
 	}
 
 	public ChessBoard getChessboard() {
@@ -24,10 +31,34 @@ public class GameState implements Iterable<GameState>{
 	/*
 	 * The heuristic function is solely determined by how many pieces that the max(default to black) player has left on chess board, 
 	 * compared to red player.
+	 * 
+	 * Heuristic2: 
+	 * Each piece is given different weights to indicate its importance, the sum of all piece weights give the utility of the state
+	 * 
 	 * */
-	public int heuristic() {
-		int num_max_pieces = chessboard.remainingBlackPieces(), num_min_pieces = chessboard.remainingWhitePieces();
-		return (int)(10 * (float) num_max_pieces / num_min_pieces);
+	public float heuristic(int id) {
+		if(id == 0) {
+			int num_max_pieces = chessboard.remainingBlackPieces(), num_min_pieces = chessboard.remainingWhitePieces();
+			return (10 * (float) num_max_pieces / num_min_pieces);			
+		}		
+		else if(id == 1){
+			int blackSum = 0;
+			int redSum = 0;
+
+			// Get each of the black pieces, 
+			for (int row = 0; row < 8; row++) {
+				for (int column = 0; column < 8; column++) {
+					ChessPiece piece = chessboard.getPiece(row, column);
+					if(piece == null) continue;
+					if(piece.getColor() == ChessPiece.BLACK)
+						blackSum = blackSum + weights.get(piece.getClass().getSimpleName());
+					else
+						redSum = redSum + weights.get(piece.getClass().getSimpleName());
+				}
+			}
+			return (float)blackSum / redSum;			
+		}
+		return 0;
 	}
 
 	@Override
