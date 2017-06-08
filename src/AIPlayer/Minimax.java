@@ -14,7 +14,7 @@ public class Minimax {
 		GameState game_state = new GameState(chessboard);
 		tmpState = null;
 		boolean maxPlayer = !chessboard.getTurn();
-		float ret = minimax(game_state, 5, maxPlayer, true,Integer.MIN_VALUE, Integer.MAX_VALUE);
+		float ret = minimax(game_state, 4, maxPlayer, true,Integer.MIN_VALUE, Integer.MAX_VALUE);
 		System.out.println("best move will have ranking: " + Float.toString(ret));
 		return state2Movement(game_state, tmpState);
 	}
@@ -58,9 +58,14 @@ public class Minimax {
 		if(max_player) {
 			best_val = Float.MIN_VALUE;
 			for(GameState child_state : game_state) {
+				// Debug condition
+				//if(firstRecur && child_state.getChessboard().getPiece(4, 3).getColor() == false)
+				//	System.out.println("Stop here\n");
+
 				float ret = minimax(child_state, depth - 1, false, false, alpha, beta);
-				alpha = Math.max(best_val, ret);
-				if(firstRecur && alpha >= ret)
+				float prevAlpha = alpha;
+				alpha = Math.max(alpha, ret);
+				if(firstRecur && alpha > prevAlpha)
 					tmpState = child_state;
 				if(alpha >= beta)
 					break;
@@ -74,7 +79,10 @@ public class Minimax {
 			best_val = Float.MAX_VALUE;
 			for(GameState child_state : game_state) {
 				float ret = minimax(child_state, depth - 1, true, false, alpha, beta);
-				beta = Math.min(best_val, ret);
+				float prevBeta = beta;
+				beta = Math.min(beta, ret);
+				if(firstRecur && beta < prevBeta)
+					tmpState = child_state;
 				if(alpha >= beta)
 					break;
 			}
@@ -86,10 +94,25 @@ public class Minimax {
 	}
 	
 	public static void main(String[] args) {
-		ChessBoard b = new ChessBoard();
+		
+		String[][] strb = 
+			{ 
+			{ "BR", "NN", "BB", "BQ", "BK", "BB", "BH", "BR" },
+			{ "BP", "BP", "BP", "BP", "BP", "BP", "BP", "BP" }, 
+			{ "BH", "NN", "NN", "NN", "NN", "NN", "NN", "NN" },
+			{ "NN", "NN", "NN", "NN", "NN", "NN", "NN", "NN" }, 
+			{ "NN", "WP", "NN", "NN", "NN", "NN", "NN", "NN" },
+			{ "NN", "NN", "NN", "NN", "NN", "NN", "NN", "NN" }, 
+			{ "WP", "WP", "WP", "WP", "WP", "WP", "WP", "WP" },
+			{ "WR", "WH", "WB", "WQ", "WK", "WB", "WH", "WR" },
+			};
+		
+		ChessBoard b = new ChessBoard(strb, false);
 		// Black(Max) goes first
-		b.setTurn(false);
-		//System.out.println(b);
+		//b.setTurn(false);
+		System.out.println("Before: ");
+		System.out.println(b);
+		System.out.println("After########################################: ");
 		Minimax m = new Minimax();
 		System.out.println(m.minimax_move(b));		
 	}

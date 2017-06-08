@@ -9,12 +9,12 @@ public class GameState implements Iterable<GameState>{
 	HashMap<String, Integer> weights = new HashMap<String, Integer>();
 	public GameState(ChessBoard chessboard) {
 		this.chessboard = chessboard;
-		weights.put("King", 10);
-		weights.put("Queen", 9);
-		weights.put("Bishop", 4);
-		weights.put("Rook", 6);
-		weights.put("Knight", 5);
-		weights.put("Pawn", 1);
+		weights.put("King", 50);
+		weights.put("Queen", 20);
+		weights.put("Bishop", 7);
+		weights.put("Rook", 8);
+		weights.put("Knight", 7);
+		weights.put("Pawn", 3);
 	}
 
 	public ChessBoard getChessboard() {
@@ -56,6 +56,8 @@ public class GameState implements Iterable<GameState>{
 						redSum = redSum + weights.get(piece.getClass().getSimpleName());
 				}
 			}
+			// if(blackSum != redSum)
+			//	System.out.println("sum differs......" + Integer.toString(blackSum) + " " + Integer.toString(redSum));
 			return (float)blackSum / redSum;			
 		}
 		return 0;
