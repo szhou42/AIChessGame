@@ -34,7 +34,7 @@ public class GameState implements Iterable<GameState>{
 	 * 
 	 * Heuristic2: 
 	 * Each piece is given different weights to indicate its importance, the sum of all piece weights give the utility of the state
-	 * 
+	 * Also, give rewards to states that are more aggresive
 	 * */
 	public float heuristic(int id) {
 		if(id == 0) {
@@ -44,21 +44,23 @@ public class GameState implements Iterable<GameState>{
 		else if(id == 1){
 			int blackSum = 0;
 			int redSum = 0;
-
+			int blackXcoordSum = 0;
 			// Get each of the black pieces, 
 			for (int row = 0; row < 8; row++) {
 				for (int column = 0; column < 8; column++) {
 					ChessPiece piece = chessboard.getPiece(row, column);
 					if(piece == null) continue;
-					if(piece.getColor() == ChessPiece.BLACK)
+					if(piece.getColor() == ChessPiece.BLACK) {
+						blackXcoordSum += row;
 						blackSum = blackSum + weights.get(piece.getClass().getSimpleName());
+					}
 					else
 						redSum = redSum + weights.get(piece.getClass().getSimpleName());
 				}
 			}
 			// if(blackSum != redSum)
 			//	System.out.println("sum differs......" + Integer.toString(blackSum) + " " + Integer.toString(redSum));
-			return (float)blackSum / redSum;			
+			return (float)blackSum / redSum + blackXcoordSum * 0.01f;			
 		}
 		return 0;
 	}
